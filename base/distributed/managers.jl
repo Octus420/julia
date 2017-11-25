@@ -456,7 +456,13 @@ end
 const client_port = Ref{Cushort}(0)
 
 function socket_reuse_port()
-    @static if is_linux() || is_apple()
+
+    # Revert OSX support for now. On OSX, client socket port number reuse
+    # does not play well in a scenario where worker processes are repeatedly
+    # created and torn down, i.e., when the new workers end up reusing a
+    # a previous listen port.
+#    @static if is_linux() || is_apple()
+    @static if is_linux()
         s = TCPSocket(delay = false)
 
         # Linux requires the port to be bound before setting REUSEPORT, OSX after.
