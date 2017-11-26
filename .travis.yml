@@ -49,6 +49,7 @@ branches:
     - master
     - /^release-.*/
     - /^v\d+\.\d+\.\d+$/
+    - jn/libwhich
 notifications:
     email: false
     irc:
@@ -126,13 +127,15 @@ script:
           false; }
     # compile / install Julia
     - make $BUILDOPTS NO_GIT=1 prefix=/tmp/julia install | moreutils/ts -s "%.s"
-    - make $BUILDOPTS NO_GIT=1 build-stats
-    - du -sk /tmp/julia/*
     - if [ `uname` = "Darwin" ]; then
         for name in suitesparseconfig spqr umfpack colamd cholmod amd suitesparse_wrapper; do
             install -pm755 usr/lib/lib${name}*.dylib* /tmp/julia/lib/julia/;
         done;
       fi
+    - make $BUILDOPTS NO_GIT=1 build-stats
+    - du -sk /tmp/julia/*
+    - ls -l /tmp/julia/usr/lib
+    - ls -l /tmp/julia/usr/lib/julia
     - cd .. && mv julia julia2
     # run tests
     - /tmp/julia/bin/julia --sysimage-native-code=no -e 'true' &&
